@@ -23,8 +23,9 @@ public partial class App : Application
 
         var overview = new OverviewViewModel(_metricsService);
         var performance = new PerformanceViewModel(overview);
+        var storage = new StorageViewModel(storageService);
         var dialogService = new DialogService();
-        _mainViewModel = new MainViewModel(_samplingService, overview, performance, processService, dialogService);
+        _mainViewModel = new MainViewModel(_samplingService, overview, performance, storage, processService, dialogService);
 
         _mainWindow = new MainWindow
         {

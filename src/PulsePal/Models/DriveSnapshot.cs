@@ -10,9 +10,15 @@ public sealed record DriveSnapshot(
     double UsedPercent,
     bool IsReady)
 {
+    public string Letter => Name.TrimEnd('\\');
+
+    public string Title => string.IsNullOrWhiteSpace(Label) ? "Local Disk" : Label;
+
     public string DisplayName => string.IsNullOrWhiteSpace(Label) ? Name.TrimEnd('\\') : $"{Label} ({Name.TrimEnd('\\')})";
 
     public string FreeText => FormatBytes(FreeBytes);
+
+    public string UsedText => FormatBytes(Math.Max(0, TotalBytes - FreeBytes));
 
     public string TotalText => FormatBytes(TotalBytes);
 

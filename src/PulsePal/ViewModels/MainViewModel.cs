@@ -25,6 +25,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly ISamplingService _samplingService;
     private readonly OverviewViewModel _overview;
     private readonly PerformanceViewModel _performance;
+    private readonly StorageViewModel _storage;
     private readonly DispatcherTimer _clockTimer;
     private readonly Dictionary<string, PlaceholderPageViewModel> _placeholderPages = [];
     private double _smoothedLoad = -1;
@@ -34,12 +35,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
         ISamplingService samplingService,
         OverviewViewModel overview,
         PerformanceViewModel performance,
+        StorageViewModel storage,
         IProcessService processService,
         IDialogService dialogService)
     {
         _samplingService = samplingService;
         _overview = overview;
         _performance = performance;
+        _storage = storage;
         _processesViewModel = new ProcessesViewModel(processService, dialogService);
         _dispatcher = Dispatcher.CurrentDispatcher;
 
@@ -128,6 +131,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             "overview" => _overview,
             "processes" => _processesViewModel,
             "performance" => _performance,
+            "storage" => _storage,
             _ when _placeholderPages.TryGetValue(item.Key, out var page) => page,
             _ => _overview
         };
@@ -158,6 +162,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
         {
             _overview.ApplyStorage(drives);
+            _storage.ApplyStorage(drives);
         }));
     }
 
@@ -206,12 +211,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private void BuildPlaceholderPages()
     {
-        _placeholderPages["storage"] = new PlaceholderPageViewModel(
-            "Storage",
-            "DRIVE SHELVES / NEXT UP",
-            "Every drive will get its own shelf, filesystem sticker, and a clear look at what is left.",
-            "#FF6FA8");
-
         _placeholderPages["sensors"] = new PlaceholderPageViewModel(
             "Sensors",
             "THERMOMETERS / NEXT UP",

@@ -381,6 +381,7 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="1.5"
                                 CornerRadius="3,5,4,3" />
+                        <Border x:Name="PART_Track" Background="Transparent" />
                         <Border x:Name="PART_Indicator"
                                 HorizontalAlignment="Left"
                                 Background="{TemplateBinding Foreground}"
