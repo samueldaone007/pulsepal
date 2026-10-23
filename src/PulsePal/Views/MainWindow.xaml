@@ -216,14 +216,14 @@
                                               StrokeStartLineCap="Round"
                                               StrokeEndLineCap="Round"
                                               StrokeLineJoin="Round"
-                                              Width="18" Height="18"
+                                              Width="16" Height="16"
                                               Stretch="Uniform"
-                                              Margin="0,0,7,0"
+                                              Margin="0,0,6,0"
                                               VerticalAlignment="Center" />
                                         <TextBlock Text="{Binding Label}"
                                                    FontFamily="{StaticResource DisplayFont}"
                                                    FontWeight="SemiBold"
-                                                   FontSize="13"
+                                                   FontSize="12.5"
                                                    Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                                    VerticalAlignment="Center" />
                                     </StackPanel>
@@ -238,11 +238,8 @@
                               StrokeThickness="1.8"
                               Width="19" Height="12"
                               Stretch="Uniform"
-                              Margin="0,0,7,0" />
-                        <TextBlock Text="{Binding LastTickText}"
-                                   Style="{StaticResource SmallMuted}"
-                                   FontSize="10.5"
-                                   VerticalAlignment="Center" />
+                              Margin="0,0,7,0"
+                              ToolTip="{Binding LastTickText}" />
                     </StackPanel>
 
                     <Rectangle Grid.ColumnSpan="2"
@@ -251,7 +248,10 @@
                 </Grid>
 
                 <!-- ===================== Page content ===================== -->
-                <ContentControl Grid.Row="2" Content="{Binding CurrentPage}" />
+                <ContentControl Grid.Row="2"
+                                Content="{Binding CurrentPage}"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Stretch" />
             </Grid>
         </Grid>
     </Border>

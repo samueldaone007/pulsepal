@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using PulsePal.Services;
 using PulsePal.ViewModels;
@@ -7,6 +8,9 @@ namespace PulsePal;
 
 public partial class App : Application
 {
+    [DllImport("user32.dll")]
+    private static extern uint GetDpiForSystem();
+
     private MetricsService? _metricsService;
     private SamplingService? _samplingService;
     private MainViewModel? _mainViewModel;
@@ -31,12 +35,20 @@ public partial class App : Application
 
         // Keep the first window fully on screen, even on a 720p desktop.
         var workArea = SystemParameters.WorkArea;
-        _mainWindow.MinWidth = Math.Min(1120, Math.Max(760, workArea.Width - 24));
-        _mainWindow.MinHeight = Math.Min(640, Math.Max(420, workArea.Height - 24));
-        _mainWindow.Width = Math.Min(1440, workArea.Width - 24);
-        _mainWindow.Height = Math.Min(940, workArea.Height - 24);
-        _mainWindow.Left = workArea.Left + (workArea.Width - _mainWindow.Width) / 2;
-        _mainWindow.Top = workArea.Top + (workArea.Height - _mainWindow.Height) / 2;
+        // SystemParameters.WorkArea can report physical pixels on high-DPI screens
+        // in a per-monitor-aware process, so convert it back to WPF device-independent
+        // units before sizing the window. This keeps the window fully on screen at
+        // 125%, 150%, and 175% scaling instead of extending past the right/bottom edge.
+        var dpiScale = GetDpiForSystem() / 96.0;
+        var workWidth = workArea.Width / dpiScale;
+        var workHeight = workArea.Height / dpiScale;
+
+        _mainWindow.MinWidth = Math.Min(1000, Math.Max(720, workWidth - 16));
+        _mainWindow.MinHeight = Math.Min(600, Math.Max(420, workHeight - 16));
+        _mainWindow.Width = Math.Min(1440, workWidth - 16);
+        _mainWindow.Height = Math.Min(940, workHeight - 16);
+        _mainWindow.Left = workArea.Left / dpiScale + (workWidth - _mainWindow.Width) / 2;
+        _mainWindow.Top = workArea.Top / dpiScale + (workHeight - _mainWindow.Height) / 2;
 
         MainWindow = _mainWindow;
         _mainWindow.Show();
