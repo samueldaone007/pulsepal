@@ -29,12 +29,14 @@ public partial class App : Application
         var storage = new StorageViewModel(storageService);
         var dialogService = new DialogService();
         var sensors = new SensorsViewModel(elevationService, dialogService);
+        var services = new ServicesViewModel(new ServiceControlService(), elevationService, dialogService);
         _mainViewModel = new MainViewModel(
             _samplingService,
             overview,
             performance,
             storage,
             sensors,
+            services,
             processService,
             dialogService);
 

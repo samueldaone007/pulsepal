@@ -35,6 +35,10 @@
                 <views:SensorsPage />
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type vm:ServicesViewModel}">
+                <views:ServicesPage />
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type vm:PlaceholderPageViewModel}">
                 <views:PlaceholderPage />
             </DataTemplate>

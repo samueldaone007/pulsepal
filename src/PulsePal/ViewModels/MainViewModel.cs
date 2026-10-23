@@ -27,6 +27,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly PerformanceViewModel _performance;
     private readonly StorageViewModel _storage;
     private readonly SensorsViewModel _sensors;
+    private readonly ServicesViewModel _services;
     private readonly DispatcherTimer _clockTimer;
     private readonly Dictionary<string, PlaceholderPageViewModel> _placeholderPages = [];
     private double _smoothedLoad = -1;
@@ -38,6 +39,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         PerformanceViewModel performance,
         StorageViewModel storage,
         SensorsViewModel sensors,
+        ServicesViewModel services,
         IProcessService processService,
         IDialogService dialogService)
     {
@@ -46,6 +48,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _performance = performance;
         _storage = storage;
         _sensors = sensors;
+        _services = services;
         _processesViewModel = new ProcessesViewModel(processService, dialogService);
         _dispatcher = Dispatcher.CurrentDispatcher;
 
@@ -137,6 +140,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             "performance" => _performance,
             "storage" => _storage,
             "sensors" => _sensors,
+            "services" => _services,
             _ when _placeholderPages.TryGetValue(item.Key, out var page) => page,
             _ => _overview
         };
@@ -233,12 +237,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private void BuildPlaceholderPages()
     {
-        _placeholderPages["services"] = new PlaceholderPageViewModel(
-            "Services",
-            "SERVICE HATCH / NEXT UP",
-            "Starting and stopping Windows services is coming, with confirmations and a firm admin gate.",
-            "#B8F25B");
-
         _placeholderPages["settings"] = new PlaceholderPageViewModel(
             "Settings",
             "THE KNOB DRAWER / NEXT UP",
