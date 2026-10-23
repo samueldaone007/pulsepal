@@ -22,8 +22,9 @@ public partial class App : Application
         _samplingService = new SamplingService(_metricsService, processService, storageService);
 
         var overview = new OverviewViewModel(_metricsService);
+        var performance = new PerformanceViewModel(overview);
         var dialogService = new DialogService();
-        _mainViewModel = new MainViewModel(_samplingService, overview, processService, dialogService);
+        _mainViewModel = new MainViewModel(_samplingService, overview, performance, processService, dialogService);
 
         _mainWindow = new MainWindow
         {

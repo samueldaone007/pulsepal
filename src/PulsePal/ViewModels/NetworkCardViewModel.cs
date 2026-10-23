@@ -17,6 +17,7 @@ public partial class NetworkCardViewModel : MetricCardViewModel
         ValueFormat = "0.0";
         Detail = "↑ n/a";
         SecondaryDetail = "no active adapter";
+        StatUnit = " Mb/s";
     }
 
     public ObservableCollection<NetworkAdapterOption> NetworkAdapters { get; } = [];

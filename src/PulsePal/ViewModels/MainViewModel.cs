@@ -24,15 +24,22 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly Dispatcher _dispatcher;
     private readonly ISamplingService _samplingService;
     private readonly OverviewViewModel _overview;
+    private readonly PerformanceViewModel _performance;
     private readonly DispatcherTimer _clockTimer;
     private readonly Dictionary<string, PlaceholderPageViewModel> _placeholderPages = [];
     private double _smoothedLoad = -1;
     private readonly ProcessesViewModel _processesViewModel;
 
-    public MainViewModel(ISamplingService samplingService, OverviewViewModel overview, IProcessService processService, IDialogService dialogService)
+    public MainViewModel(
+        ISamplingService samplingService,
+        OverviewViewModel overview,
+        PerformanceViewModel performance,
+        IProcessService processService,
+        IDialogService dialogService)
     {
         _samplingService = samplingService;
         _overview = overview;
+        _performance = performance;
         _processesViewModel = new ProcessesViewModel(processService, dialogService);
         _dispatcher = Dispatcher.CurrentDispatcher;
 
@@ -120,6 +127,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             "overview" => _overview,
             "processes" => _processesViewModel,
+            "performance" => _performance,
             _ when _placeholderPages.TryGetValue(item.Key, out var page) => page,
             _ => _overview
         };
@@ -130,6 +138,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
         {
             _overview.ApplyMetrics(snapshot);
+            _performance.ApplyMetrics(snapshot);
             LastTickText = $"last tick {snapshot.Timestamp:HH:mm:ss}";
             UpdateMood(snapshot);
         }));
@@ -197,12 +206,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private void BuildPlaceholderPages()
     {
-        _placeholderPages["performance"] = new PlaceholderPageViewModel(
-            "Performance",
-            "BIG CHARTS / NEXT UP",
-            "The sixty-second charts get the larger room next. Same handful of samples, more elbow room.",
-            "#6EC6FF");
-
         _placeholderPages["storage"] = new PlaceholderPageViewModel(
             "Storage",
             "DRIVE SHELVES / NEXT UP",

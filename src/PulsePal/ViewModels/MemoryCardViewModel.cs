@@ -28,7 +28,9 @@ public partial class MemoryCardViewModel : MetricCardViewModel
             : "memory reading n/a";
 
         SecondaryDetail = snapshot.MemoryPercent is double p
-            ? p >= 85 ? "allocators are feasting" : "plenty of breathing room"
+            ? p >= 85 ? "allocators are feasting"
+            : p >= 70 ? "getting cozy"
+            : "plenty of breathing room"
             : string.Empty;
     }
 }
