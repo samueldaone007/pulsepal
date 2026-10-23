@@ -9,6 +9,7 @@ public partial class App : Application
 {
     private MetricsService? _metricsService;
     private SamplingService? _samplingService;
+    private SensorService? _sensorService;
     private MainViewModel? _mainViewModel;
     private MainWindow? _mainWindow;
 
@@ -19,13 +20,23 @@ public partial class App : Application
         _metricsService = new MetricsService();
         var processService = new ProcessService();
         var storageService = new StorageService();
-        _samplingService = new SamplingService(_metricsService, processService, storageService);
+        var elevationService = new ElevationService();
+        _sensorService = new SensorService(elevationService.IsAdministrator);
+        _samplingService = new SamplingService(_metricsService, processService, storageService, _sensorService);
 
         var overview = new OverviewViewModel(_metricsService);
         var performance = new PerformanceViewModel(overview);
         var storage = new StorageViewModel(storageService);
         var dialogService = new DialogService();
-        _mainViewModel = new MainViewModel(_samplingService, overview, performance, storage, processService, dialogService);
+        var sensors = new SensorsViewModel(elevationService, dialogService);
+        _mainViewModel = new MainViewModel(
+            _samplingService,
+            overview,
+            performance,
+            storage,
+            sensors,
+            processService,
+            dialogService);
 
         _mainWindow = new MainWindow
         {
@@ -45,12 +56,22 @@ public partial class App : Application
         MainWindow = _mainWindow;
         _mainWindow.Show();
         _samplingService.Start();
+
+        var startupPage = e.Args
+            .FirstOrDefault(argument => argument.StartsWith("--page=", StringComparison.OrdinalIgnoreCase))
+            ?.Substring("--page=".Length);
+
+        if (!string.IsNullOrWhiteSpace(startupPage))
+        {
+            _mainViewModel.NavigateTo(startupPage);
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
         _mainViewModel?.Dispose();
         _samplingService?.Dispose();
+        _sensorService?.Dispose();
         _metricsService?.Dispose();
         base.OnExit(e);
     }

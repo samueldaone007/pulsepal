@@ -26,6 +26,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly OverviewViewModel _overview;
     private readonly PerformanceViewModel _performance;
     private readonly StorageViewModel _storage;
+    private readonly SensorsViewModel _sensors;
     private readonly DispatcherTimer _clockTimer;
     private readonly Dictionary<string, PlaceholderPageViewModel> _placeholderPages = [];
     private double _smoothedLoad = -1;
@@ -36,6 +37,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         OverviewViewModel overview,
         PerformanceViewModel performance,
         StorageViewModel storage,
+        SensorsViewModel sensors,
         IProcessService processService,
         IDialogService dialogService)
     {
@@ -43,6 +45,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _overview = overview;
         _performance = performance;
         _storage = storage;
+        _sensors = sensors;
         _processesViewModel = new ProcessesViewModel(processService, dialogService);
         _dispatcher = Dispatcher.CurrentDispatcher;
 
@@ -80,6 +83,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _samplingService.MetricsUpdated += OnMetricsUpdated;
         _samplingService.ProcessesUpdated += OnProcessesUpdated;
         _samplingService.StorageUpdated += OnStorageUpdated;
+        _samplingService.SensorsUpdated += OnSensorsUpdated;
         _samplingService.SamplingError += OnSamplingError;
     }
 
@@ -132,9 +136,19 @@ public partial class MainViewModel : ObservableObject, IDisposable
             "processes" => _processesViewModel,
             "performance" => _performance,
             "storage" => _storage,
+            "sensors" => _sensors,
             _ when _placeholderPages.TryGetValue(item.Key, out var page) => page,
             _ => _overview
         };
+    }
+
+    public void NavigateTo(string key)
+    {
+        var item = NavItems.FirstOrDefault(n => string.Equals(n.Key, key, StringComparison.OrdinalIgnoreCase));
+        if (item is not null)
+        {
+            Navigate(item);
+        }
     }
 
     private void OnMetricsUpdated(SystemMetricSnapshot snapshot)
@@ -163,6 +177,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             _overview.ApplyStorage(drives);
             _storage.ApplyStorage(drives);
+        }));
+    }
+
+    private void OnSensorsUpdated(SensorSnapshot snapshot)
+    {
+        _dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+        {
+            _sensors.ApplySnapshot(snapshot);
         }));
     }
 
@@ -211,12 +233,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private void BuildPlaceholderPages()
     {
-        _placeholderPages["sensors"] = new PlaceholderPageViewModel(
-            "Sensors",
-            "THERMOMETERS / NEXT UP",
-            "LibreHardwareMonitor is waiting in the wings. Admin permission decides how much gossip the hardware shares.",
-            "#FF5A36");
-
         _placeholderPages["services"] = new PlaceholderPageViewModel(
             "Services",
             "SERVICE HATCH / NEXT UP",
@@ -236,6 +252,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _samplingService.MetricsUpdated -= OnMetricsUpdated;
         _samplingService.ProcessesUpdated -= OnProcessesUpdated;
         _samplingService.StorageUpdated -= OnStorageUpdated;
+        _samplingService.SensorsUpdated -= OnSensorsUpdated;
         _samplingService.SamplingError -= OnSamplingError;
     }
 

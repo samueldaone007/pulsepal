@@ -1,0 +1,438 @@
+<UserControl x:Class="PulsePal.Views.SensorsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:PulsePal.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="900">
+    <UserControl.Resources>
+        <Style x:Key="SensorTitle" TargetType="TextBlock" BasedOn="{StaticResource Eyebrow}">
+            <Setter Property="FontSize" Value="9.5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="SensorName" TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
+
+        <Style x:Key="SensorDetail" TargetType="TextBlock" BasedOn="{StaticResource SmallMuted}">
+            <Setter Property="FontSize" Value="8.5" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
+
+        <Style x:Key="SummaryCard" TargetType="Border" BasedOn="{StaticResource StickerCard}">
+            <Setter Property="Background" Value="{StaticResource Panel}" />
+            <Setter Property="CornerRadius" Value="12,7,14,9" />
+            <Setter Property="Padding" Value="14,12" />
+            <Setter Property="Height" Value="94" />
+        </Style>
+
+        <Style x:Key="SensorGroupCard" TargetType="Border" BasedOn="{StaticResource StickerCardHover}">
+            <Setter Property="Background" Value="{StaticResource Panel}" />
+            <Setter Property="CornerRadius" Value="14,9,16,11" />
+            <Setter Property="Padding" Value="16,12" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+        </Style>
+
+        <Style x:Key="SensorTile" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource PanelSoft}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Hairline}" />
+            <Setter Property="BorderThickness" Value="1.5" />
+            <Setter Property="CornerRadius" Value="6,4,8,5" />
+            <Setter Property="Padding" Value="9,6" />
+            <Setter Property="Margin" Value="0,0,8,8" />
+            <Setter Property="MinHeight" Value="47" />
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  HorizontalContentAlignment="Stretch"
+                  PanningMode="VerticalOnly">
+        <Grid Margin="24,14,24,24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="THERMOMETERS / HARDWARE"
+                               Style="{StaticResource Eyebrow}"
+                               Foreground="{StaticResource Alert}"
+                               FontSize="9.5" />
+                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                        <TextBlock Text="Sensors"
+                                   Style="{StaticResource PageTitle}"
+                                   FontSize="38" />
+                        <Path Data="M12,3.2 C10.2,3.2 9.1,4.7 9.1,6.5 L9.1,14.2 C7.6,15.7 7.4,18.4 9,20.1 C10.8,21.9 13.7,21.6 15,19.5 C16,17.9 15.8,15.7 14.5,14.2 L14.5,6.5 C14.5,4.7 13.8,3.2 12,3.2 Z M12,8 L12,16.7 M12,18.1 L12,18.3"
+                              Stroke="{StaticResource Alert}"
+                              StrokeThickness="2.1"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              Width="16"
+                              Height="24"
+                              Stretch="Uniform"
+                              Margin="12,0,0,2"
+                              VerticalAlignment="Bottom" />
+                    </StackPanel>
+                    <TextBlock Text="Temperatures, fans, voltages, and power, straight from the board."
+                               Style="{StaticResource MutedText}"
+                               FontSize="13"
+                               Margin="0,3,0,0" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Bottom"
+                            Margin="14,0,0,3">
+                    <Border Style="{StaticResource Chip}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="6" Height="6" Fill="{StaticResource Alert}" Margin="0,0,6,0">
+                                <Ellipse.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever">
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                 From="1" To="0.35"
+                                                                 Duration="0:0:1.2"
+                                                                 AutoReverse="True" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                            <TextBlock Text="{Binding LastUpdatedText}"
+                                       Style="{StaticResource Eyebrow}"
+                                       FontSize="8.5"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border>
+                        <Border.Style>
+                            <Style TargetType="Border" BasedOn="{StaticResource Chip}">
+                                <Setter Property="Background" Value="{StaticResource AmberSoft}" />
+                                <Setter Property="BorderBrush" Value="{StaticResource Amber}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsElevated}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource LimeSoft}" />
+                                        <Setter Property="BorderBrush" Value="{StaticResource Lime}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="{Binding StateText}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource Eyebrow}">
+                                    <Setter Property="Foreground" Value="{StaticResource Amber}" />
+                                    <Setter Property="FontSize" Value="8.5" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsElevated}" Value="True">
+                                            <Setter Property="Foreground" Value="{StaticResource Lime}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- ===================== Elevation banner ===================== -->
+            <Border Grid.Row="1"
+                    Background="{StaticResource AmberSoft}"
+                    BorderBrush="{StaticResource Amber}"
+                    BorderThickness="2"
+                    CornerRadius="12,7,14,9"
+                    Padding="15,12"
+                    Margin="0,12,0,0"
+                    Visibility="{Binding ShowElevationBanner, Converter={StaticResource BoolToVisibility}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Width="38"
+                            Height="38"
+                            Background="{StaticResource CocoaDeep}"
+                            BorderBrush="{StaticResource Amber}"
+                            BorderThickness="1.5"
+                            CornerRadius="8,5,10,6"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="!"
+                                   Style="{StaticResource DisplayText}"
+                                   FontSize="21"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource Amber}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Margin="12,0,14,0" VerticalAlignment="Center">
+                        <TextBlock Text="The thermometers are shy"
+                                   Style="{StaticResource BodyText}"
+                                   FontSize="14"
+                                   FontWeight="SemiBold" />
+                        <TextBlock Text="Windows only shares temperatures, fans, and voltages with administrator permission. PulsePal stays open either way."
+                                   Style="{StaticResource SmallMuted}"
+                                   FontSize="9.5"
+                                   TextWrapping="Wrap"
+                                   Margin="0,2,0,0" />
+                    </StackPanel>
+
+                    <Button Grid.Column="2"
+                            Style="{StaticResource AmberButton}"
+                            Content="RESTART ELEVATED"
+                            Command="{Binding ElevateCommand}"
+                            MinWidth="168"
+                            VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <!-- ===================== Summary ===================== -->
+            <Grid Grid.Row="2" Margin="0,12,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource SummaryCard}" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="HOTTEST" Style="{StaticResource Eyebrow}" Foreground="{StaticResource Alert}" FontSize="8" />
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <controls:AnimatedNumber Value="{Binding HottestCelsius}"
+                                                     ValueFormat="0"
+                                                     FontFamily="{StaticResource MonoFont}"
+                                                     FontWeight="Bold"
+                                                     FontSize="30"
+                                                     LineHeight="30"
+                                                     Foreground="{StaticResource Alert}" />
+                            <TextBlock Text="°C" Style="{StaticResource UnitText}" Foreground="{StaticResource Alert}" FontSize="12" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding HottestDetail}" Style="{StaticResource SensorDetail}" Margin="0,2,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource SummaryCard}" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="FANS" Style="{StaticResource Eyebrow}" Foreground="{StaticResource Sky}" FontSize="8" />
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <controls:AnimatedNumber Value="{Binding FanRpm}"
+                                                     ValueFormat="0"
+                                                     FontFamily="{StaticResource MonoFont}"
+                                                     FontWeight="Bold"
+                                                     FontSize="30"
+                                                     LineHeight="30"
+                                                     Foreground="{StaticResource Sky}" />
+                            <TextBlock Text="RPM" Style="{StaticResource UnitText}" Foreground="{StaticResource Sky}" FontSize="11" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding FanDetail}" Style="{StaticResource SensorDetail}" Margin="0,2,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Style="{StaticResource SummaryCard}" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="POWER PEAK" Style="{StaticResource Eyebrow}" Foreground="{StaticResource Amber}" FontSize="8" />
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <controls:AnimatedNumber Value="{Binding PowerWatts}"
+                                                     ValueFormat="0.0"
+                                                     FontFamily="{StaticResource MonoFont}"
+                                                     FontWeight="Bold"
+                                                     FontSize="30"
+                                                     LineHeight="30"
+                                                     Foreground="{StaticResource Amber}" />
+                            <TextBlock Text="W" Style="{StaticResource UnitText}" Foreground="{StaticResource Amber}" FontSize="12" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding PowerDetail}" Style="{StaticResource SensorDetail}" Margin="0,2,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="3" Style="{StaticResource SummaryCard}">
+                    <StackPanel>
+                        <TextBlock Text="LIVE CHANNELS" Style="{StaticResource Eyebrow}" Foreground="{StaticResource Lime}" FontSize="8" />
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <controls:AnimatedNumber Value="{Binding LiveReadings}"
+                                                     ValueFormat="0"
+                                                     FontFamily="{StaticResource MonoFont}"
+                                                     FontWeight="Bold"
+                                                     FontSize="30"
+                                                     LineHeight="30"
+                                                     Foreground="{StaticResource Lime}" />
+                            <TextBlock Text="LIVE" Style="{StaticResource UnitText}" Foreground="{StaticResource Lime}" FontSize="10" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding ReadingsDetail}" Style="{StaticResource SensorDetail}" Margin="0,2,0,0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ===================== Channel header ===================== -->
+            <Grid Grid.Row="3" Margin="0,15,0,8">
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="6" Height="6" Background="{StaticResource Alert}" CornerRadius="2,1,2,1" Margin="0,0,7,0" VerticalAlignment="Center" />
+                    <TextBlock Text="SENSOR CHANNELS"
+                               Style="{StaticResource Eyebrow}"
+                               Foreground="{StaticResource Alert}"
+                               FontSize="9" />
+                </StackPanel>
+                <TextBlock Text="{Binding StatusText}"
+                           Style="{StaticResource SmallMuted}"
+                           FontSize="9"
+                           HorizontalAlignment="Right"
+                           TextTrimming="CharacterEllipsis"
+                           MaxWidth="560" />
+            </Grid>
+
+            <!-- ===================== Device groups ===================== -->
+            <ItemsControl Grid.Row="4" ItemsSource="{Binding Groups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource SensorGroupCard}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Width="7" Height="7" Background="{StaticResource Alert}" CornerRadius="2,1,2,1" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Hardware}"
+                                                   Style="{StaticResource BodyText}"
+                                                   FontSize="17"
+                                                   FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   MaxWidth="520"
+                                                   VerticalAlignment="Center" />
+                                        <Border Style="{StaticResource Chip}" Padding="5,1" Background="Transparent" BorderBrush="{StaticResource Hairline}" Margin="8,0,0,0">
+                                            <TextBlock Text="{Binding HardwareType}"
+                                                       Style="{StaticResource Eyebrow}"
+                                                       FontSize="7.5"
+                                                       Foreground="{StaticResource Muted}" />
+                                        </Border>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding ReadingCountText}"
+                                               Style="{StaticResource SmallMuted}"
+                                               FontSize="9"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+
+                                <ItemsControl Grid.Row="1" ItemsSource="{Binding Readings}" Margin="0,8,0,0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="3" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{StaticResource SensorTile}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Name}" Style="{StaticResource SensorName}" />
+                                                        <TextBlock Text="{Binding TypeLabel}" Style="{StaticResource SensorDetail}" />
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="1"
+                                                               Text="{Binding ValueText}"
+                                                               FontFamily="{StaticResource MonoFont}"
+                                                               FontSize="12.5"
+                                                               FontWeight="Bold"
+                                                               VerticalAlignment="Center"
+                                                               Margin="8,0,0,0">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource MonoText}">
+                                                                <Setter Property="Foreground" Value="{StaticResource Cream}" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsHot}" Value="True">
+                                                                        <Setter Property="Foreground" Value="{StaticResource Alert}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- ===================== Empty state ===================== -->
+            <Border Grid.Row="4"
+                    Margin="0,2,0,0">
+                <Border.Style>
+                    <Style TargetType="Border" BasedOn="{StaticResource StickerCard}">
+                        <Setter Property="Background" Value="{StaticResource Panel}" />
+                        <Setter Property="CornerRadius" Value="12,8,14,10" />
+                        <Setter Property="Padding" Value="18,15" />
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasSensors}" Value="False">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="38"
+                            Height="38"
+                            Background="{StaticResource PanelSoft}"
+                            BorderBrush="{StaticResource Hairline}"
+                            BorderThickness="1.5"
+                            CornerRadius="8,5,10,6"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="?"
+                                   Style="{StaticResource DisplayText}"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource Muted}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                        <TextBlock Text="No sensor channels are talking yet"
+                                   Style="{StaticResource BodyText}"
+                                   FontSize="15"
+                                   FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding StatusText}"
+                                   Style="{StaticResource SmallMuted}"
+                                   FontSize="10"
+                                   TextWrapping="Wrap"
+                                   Margin="0,3,0,0" />
+                        <TextBlock Text="The monitor keeps trying quietly in the background. If the hardware stays silent, the elevation banner above is the next step."
+                                   Style="{StaticResource SmallMuted}"
+                                   FontSize="9.5"
+                                   TextWrapping="Wrap"
+                                   Margin="0,3,0,0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

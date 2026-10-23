@@ -11,6 +11,7 @@ public sealed class SamplingService : ISamplingService
     private readonly IMetricsService _metricsService;
     private readonly IProcessService _processService;
     private readonly IStorageService _storageService;
+    private readonly ISensorService _sensorService;
     private readonly object _gate = new();
 
     private CancellationTokenSource? _cancellation;
@@ -18,6 +19,7 @@ public sealed class SamplingService : ISamplingService
     private int _metricsSeconds = 1;
     private int _processSeconds = 3;
     private int _storageSeconds = 5;
+    private int _sensorSeconds = 3;
     private string? _lastError;
     private DateTime _lastErrorAt;
     private bool _disposed;
@@ -25,11 +27,13 @@ public sealed class SamplingService : ISamplingService
     public SamplingService(
         IMetricsService metricsService,
         IProcessService processService,
-        IStorageService storageService)
+        IStorageService storageService,
+        ISensorService sensorService)
     {
         _metricsService = metricsService;
         _processService = processService;
         _storageService = storageService;
+        _sensorService = sensorService;
     }
 
     public event Action<SystemMetricSnapshot>? MetricsUpdated;
@@ -37,6 +41,8 @@ public sealed class SamplingService : ISamplingService
     public event Action<IReadOnlyList<ProcessSample>>? ProcessesUpdated;
 
     public event Action<IReadOnlyList<DriveSnapshot>>? StorageUpdated;
+
+    public event Action<SensorSnapshot>? SensorsUpdated;
 
     public event Action<string>? SamplingError;
 
@@ -59,7 +65,8 @@ public sealed class SamplingService : ISamplingService
             [
                 Task.Run(() => LoopAsync(MetricsTickAsync, () => Volatile.Read(ref _metricsSeconds), token)),
                 Task.Run(() => LoopAsync(ProcessesTickAsync, () => Volatile.Read(ref _processSeconds), token)),
-                Task.Run(() => LoopAsync(StorageTickAsync, () => Volatile.Read(ref _storageSeconds), token))
+                Task.Run(() => LoopAsync(StorageTickAsync, () => Volatile.Read(ref _storageSeconds), token)),
+                Task.Run(() => LoopAsync(SensorsTickAsync, () => Volatile.Read(ref _sensorSeconds), token))
             ];
         }
     }
@@ -145,6 +152,13 @@ public sealed class SamplingService : ISamplingService
     {
         var drives = _storageService.Sample();
         Raise(StorageUpdated, drives);
+        return Task.CompletedTask;
+    }
+
+    private Task SensorsTickAsync()
+    {
+        var snapshot = _sensorService.Sample();
+        Raise(SensorsUpdated, snapshot);
         return Task.CompletedTask;
     }
 
