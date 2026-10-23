@@ -1,16 +1,43 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PulsePal.Models;
+using PulsePal.Services;
 using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace PulsePal.ViewModels;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
-    private readonly DispatcherTimer _clockTimer;
+    private static readonly Geometry SmileMouth = Freeze(Geometry.Parse("M7.5,13.9 C9.5,16.1 14.4,16.1 16.5,13.7"));
+    private static readonly Geometry FlatMouth = Freeze(Geometry.Parse("M8,15 L16,15"));
+    private static readonly Geometry WavyMouth = Freeze(Geometry.Parse("M7.5,15 C9,13.7 10.5,15.4 12,14.5 C13.5,13.7 14.8,15.4 16.5,14.2"));
+    private static readonly Geometry FrownMouth = Freeze(Geometry.Parse("M7.5,16 C9.5,13.7 14.4,13.7 16.5,16"));
 
-    public MainViewModel()
+    private static readonly Brush ChillBrush = Freeze(new SolidColorBrush(Color.FromRgb(0xFF, 0xB0, 0x20)));
+    private static readonly Brush BusyBrush = Freeze(new SolidColorBrush(Color.FromRgb(0xB8, 0xF2, 0x5B)));
+    private static readonly Brush SweatBrush = Freeze(new SolidColorBrush(Color.FromRgb(0xFF, 0x7A, 0x36)));
+    private static readonly Brush FireBrush = Freeze(new SolidColorBrush(Color.FromRgb(0xFF, 0x5A, 0x36)));
+
+    private readonly Dispatcher _dispatcher;
+    private readonly ISamplingService _samplingService;
+    private readonly OverviewViewModel _overview;
+    private readonly DispatcherTimer _clockTimer;
+    private readonly Dictionary<string, PlaceholderPageViewModel> _placeholderPages = [];
+    private double _smoothedLoad = -1;
+    private IProcessService _processService;
+    private ProcessesViewModel _processesViewModel;
+
+    public MainViewModel(ISamplingService samplingService, OverviewViewModel overview, IProcessService processService)
     {
+        _samplingService = samplingService;
+        _overview = overview;
+        _processService = processService;
+        _processesViewModel = new ProcessesViewModel(processService);
+        _dispatcher = Dispatcher.CurrentDispatcher;
+
         NavItems =
         [
             new NavItemViewModel("overview", "Overview", "M3,19 C3,11 7,4.5 12,4.5 C17,4.5 21,10 21,16 L21,19 M2.5,21 L21.5,21 M12,17 L16,10 M7.5,7.5 L9,9 M17,7 L15.8,8.7 M3.8,13 L5.5,13", "The whole patient, one glance."),
@@ -24,11 +51,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         _selectedNav = NavItems[0];
         _selectedNav.IsSelected = true;
+        _currentPage = _overview;
         _clockText = DateTime.Now.ToString("HH:mm:ss");
         _moodText = "Chill";
         _moodDetail = "nothing is on fire";
+        _moodMouth = SmileMouth;
+        _moodAccent = ChillBrush;
         _lastTickText = "local readings warming up";
         _statusLine = "LOCAL ONLY  /  NO CLOUD";
+
+        BuildPlaceholderPages();
 
         _clockTimer = new DispatcherTimer(DispatcherPriority.Background)
         {
@@ -36,12 +68,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
         };
         _clockTimer.Tick += (_, _) => ClockText = DateTime.Now.ToString("HH:mm:ss");
         _clockTimer.Start();
+
+        _samplingService.MetricsUpdated += OnMetricsUpdated;
+        _samplingService.ProcessesUpdated += OnProcessesUpdated;
+        _samplingService.StorageUpdated += OnStorageUpdated;
+        _samplingService.SamplingError += OnSamplingError;
     }
 
     public ObservableCollection<NavItemViewModel> NavItems { get; }
 
     [ObservableProperty]
     private NavItemViewModel _selectedNav;
+
+    [ObservableProperty]
+    private object _currentPage;
 
     [ObservableProperty]
     private string _clockText;
@@ -51,6 +91,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private string _moodDetail;
+
+    [ObservableProperty]
+    private Geometry _moodMouth;
+
+    [ObservableProperty]
+    private Brush _moodAccent;
 
     [ObservableProperty]
     private string _lastTickText;
@@ -72,7 +118,135 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
 
         SelectedNav = item;
+        CurrentPage = item.Key switch
+        {
+            "overview" => _overview,
+            "processes" => _processesViewModel,
+            _ when _placeholderPages.TryGetValue(item.Key, out var page) => page,
+            _ => _overview
+        };
     }
 
-    public void Dispose() => _clockTimer.Stop();
+    private void OnMetricsUpdated(SystemMetricSnapshot snapshot)
+    {
+        _dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+        {
+            _overview.ApplyMetrics(snapshot);
+            LastTickText = $"last tick {snapshot.Timestamp:HH:mm:ss}";
+            UpdateMood(snapshot);
+        }));
+    }
+
+    private void OnProcessesUpdated(IReadOnlyList<ProcessSample> processes)
+    {
+        _dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+        {
+            _overview.ApplyProcesses(processes);
+        }));
+    }
+
+    private void OnStorageUpdated(IReadOnlyList<DriveSnapshot> drives)
+    {
+        _dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+        {
+            _overview.ApplyStorage(drives);
+        }));
+    }
+
+    private void OnSamplingError(string message)
+    {
+        _dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+        {
+            LastTickText = $"sampling hiccup / {message}";
+        }));
+    }
+
+    private void UpdateMood(SystemMetricSnapshot snapshot)
+    {
+        var load = Math.Max(snapshot.CpuPercent ?? 0, snapshot.MemoryPercent ?? 0);
+        _smoothedLoad = _smoothedLoad < 0 ? load : _smoothedLoad * 0.72 + load * 0.28;
+
+        if (_smoothedLoad < 45)
+        {
+            MoodText = "Chill";
+            MoodDetail = "nothing is on fire";
+            MoodMouth = SmileMouth;
+            MoodAccent = ChillBrush;
+        }
+        else if (_smoothedLoad < 70)
+        {
+            MoodText = "Busy";
+            MoodDetail = "chugging along";
+            MoodMouth = FlatMouth;
+            MoodAccent = BusyBrush;
+        }
+        else if (_smoothedLoad < 87)
+        {
+            MoodText = "Sweating";
+            MoodDetail = "the fans are gossiping";
+            MoodMouth = WavyMouth;
+            MoodAccent = SweatBrush;
+        }
+        else
+        {
+            MoodText = "On fire";
+            MoodDetail = "call the fire brigade";
+            MoodMouth = FrownMouth;
+            MoodAccent = FireBrush;
+        }
+    }
+
+    private void BuildPlaceholderPages()
+    {
+        _placeholderPages["processes"] = new PlaceholderPageViewModel(
+            "Processes",
+            "PROCESS BENCH / NEXT UP",
+            "The process table is being sanded and sorted. Soon: search, CPU deltas, and a polite confirmation before ending anything.",
+            "#FFB020");
+
+        _placeholderPages["performance"] = new PlaceholderPageViewModel(
+            "Performance",
+            "BIG CHARTS / NEXT UP",
+            "The sixty-second charts get the larger room next. Same handful of samples, more elbow room.",
+            "#6EC6FF");
+
+        _placeholderPages["storage"] = new PlaceholderPageViewModel(
+            "Storage",
+            "DRIVE SHELVES / NEXT UP",
+            "Every drive will get its own shelf, filesystem sticker, and a clear look at what is left.",
+            "#FF6FA8");
+
+        _placeholderPages["sensors"] = new PlaceholderPageViewModel(
+            "Sensors",
+            "THERMOMETERS / NEXT UP",
+            "LibreHardwareMonitor is waiting in the wings. Admin permission decides how much gossip the hardware shares.",
+            "#FF5A36");
+
+        _placeholderPages["services"] = new PlaceholderPageViewModel(
+            "Services",
+            "SERVICE HATCH / NEXT UP",
+            "Starting and stopping Windows services is coming, with confirmations and a firm admin gate.",
+            "#B8F25B");
+
+        _placeholderPages["settings"] = new PlaceholderPageViewModel(
+            "Settings",
+            "THE KNOB DRAWER / NEXT UP",
+            "Refresh cadence, alert thresholds, Windows startup, and tray behaviour will live here.",
+            "#FFB020");
+    }
+
+    public void Dispose()
+    {
+        _clockTimer.Stop();
+        _samplingService.MetricsUpdated -= OnMetricsUpdated;
+        _samplingService.ProcessesUpdated -= OnProcessesUpdated;
+        _samplingService.StorageUpdated -= OnStorageUpdated;
+        _samplingService.SamplingError -= OnSamplingError;
+    }
+
+    private static T Freeze<T>(T freezable) where T : Freezable
+    {
+        freezable.Freeze();
+        return freezable;
+    }
 }

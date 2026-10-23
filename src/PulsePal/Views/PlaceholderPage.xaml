@@ -1,0 +1,125 @@
+<UserControl x:Class="PulsePal.Views.PlaceholderPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="24,16,24,30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="{Binding Kicker}"
+                           Style="{StaticResource Eyebrow}"
+                           Foreground="{Binding Accent}"
+                           FontSize="9.5" />
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Text="{Binding Title}" Style="{StaticResource PageTitle}" FontSize="38" />
+                    <Path Data="M1,10 L14,8 L26,12 L38,9 L48,13"
+                          Stroke="{Binding Accent}"
+                          StrokeThickness="2.2"
+                          StrokeStartLineCap="Round"
+                          StrokeEndLineCap="Round"
+                          Width="52"
+                          Height="16"
+                          Stretch="Fill"
+                          Margin="12,0,0,4"
+                          VerticalAlignment="Bottom" />
+                </StackPanel>
+            </StackPanel>
+
+            <Border Grid.Row="1"
+                    Style="{StaticResource StickerCard}"
+                    Background="{StaticResource Panel}"
+                    Padding="0"
+                    Margin="0,18,0,0"
+                    MinHeight="430">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.25*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Margin="38,34" VerticalAlignment="Center">
+                        <Border Style="{StaticResource Chip}"
+                                HorizontalAlignment="Left"
+                                Background="{StaticResource CreamSoft}"
+                                BorderBrush="{Binding Accent}"
+                                Margin="0,0,0,18">
+                            <TextBlock Text="WORK IN PROGRESS"
+                                       Style="{StaticResource Eyebrow}"
+                                       Foreground="{Binding Accent}"
+                                       FontSize="9" />
+                        </Border>
+                        <TextBlock Text="{Binding Note}"
+                                   Style="{StaticResource DisplayText}"
+                                   FontSize="30"
+                                   LineHeight="35"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="610"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="The tabs already work; this bench just needs its measurements and knobs."
+                                   Style="{StaticResource MutedText}"
+                                   FontSize="13"
+                                   Margin="0,16,0,0"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="520" />
+                    </StackPanel>
+
+                    <Grid Grid.Column="1" Background="{StaticResource PanelSoft}">
+                        <Canvas IsHitTestVisible="False">
+                            <Path Data="M10,80 C65,25 120,145 190,82 C255,24 300,120 370,58"
+                                  Stroke="{StaticResource Hairline}"
+                                  StrokeThickness="2"
+                                  StrokeDashArray="2,7"
+                                  Width="370" Height="150"
+                                  Canvas.Left="-10" Canvas.Top="45"
+                                  Stretch="Fill" />
+                            <Path Data="M40,300 L132,236 L84,365 L210,280 L156,430"
+                                  Stroke="{Binding Accent}"
+                                  StrokeThickness="2"
+                                  Opacity="0.35"
+                                  Width="230" Height="220"
+                                  Canvas.Left="70" Canvas.Top="250"
+                                  Stretch="Fill" />
+                        </Canvas>
+
+                        <Border Style="{StaticResource StickerCard}"
+                                Background="{StaticResource PanelRaised}"
+                                Width="220"
+                                Height="162"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                RenderTransformOrigin="0.5,0.5"
+                                Padding="18">
+                            <Border.RenderTransform>
+                                <RotateTransform Angle="2.4" />
+                            </Border.RenderTransform>
+                            <StackPanel>
+                                <Path Data="{StaticResource IconPulse}"
+                                      Stroke="{Binding Accent}"
+                                      StrokeThickness="2.2"
+                                      Width="56" Height="20"
+                                      Stretch="Fill"
+                                      HorizontalAlignment="Left" />
+                                <Rectangle Style="{StaticResource DashRule}" Margin="0,20,0,14" />
+                                <TextBlock Text="UNDER CONSTRUCTION"
+                                           Style="{StaticResource Eyebrow}"
+                                           FontSize="9"
+                                           Foreground="{StaticResource Muted}" />
+                                <TextBlock Text="soon-ish"
+                                           Style="{StaticResource BaseText}"
+                                           FontSize="22"
+                                           FontWeight="ExtraBold"
+                                           Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

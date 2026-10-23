@@ -27,6 +27,7 @@
   <ItemGroup>
     <!-- WinForms is only for the tray icon. Keep its implicit usings out of WPF files. -->
     <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
   </ItemGroup>
 
   <ItemGroup>

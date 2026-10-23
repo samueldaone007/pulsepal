@@ -1,6 +1,8 @@
 <Application x:Class="PulsePal.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PulsePal.ViewModels"
+             xmlns:views="clr-namespace:PulsePal.Views"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
         <ResourceDictionary>
@@ -10,7 +12,16 @@
                 <ResourceDictionary Source="Themes/Icons.xaml" />
                 <ResourceDictionary Source="Themes/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
             <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+            <DataTemplate DataType="{x:Type vm:OverviewViewModel}">
+                <views:OverviewPage />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:PlaceholderPageViewModel}">
+                <views:PlaceholderPage />
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

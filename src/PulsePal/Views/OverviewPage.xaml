@@ -1,0 +1,615 @@
+<UserControl x:Class="PulsePal.Views.OverviewPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:PulsePal.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <Style x:Key="CardTitle" TargetType="TextBlock" BasedOn="{StaticResource Eyebrow}">
+            <Setter Property="FontSize" Value="9.5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="CardDetail" TargetType="TextBlock" BasedOn="{StaticResource MonoText}">
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="Foreground" Value="{StaticResource Cream}" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
+
+        <Style x:Key="CardSubDetail" TargetType="TextBlock" BasedOn="{StaticResource SmallMuted}">
+            <Setter Property="FontSize" Value="9.5" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Setter Property="Margin" Value="0,2,0,0" />
+        </Style>
+
+        <Style x:Key="AlertTag" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource Alert}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Cream}" />
+            <Setter Property="BorderThickness" Value="1.5" />
+            <Setter Property="CornerRadius" Value="4,2,5,3" />
+            <Setter Property="Padding" Value="6,2" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsAlert}" Value="True">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer x:Name="PageScroll"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  HorizontalContentAlignment="Stretch"
+                  PanningMode="VerticalOnly"
+                  Loaded="PageScroll_Loaded">
+        <Grid x:Name="ContentGrid" Width="{Binding ViewportWidth, ElementName=PageScroll}">
+        <Grid Margin="24,16,24,30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- ===================== Page heading ===================== -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="LIVE CHECKUP / LOCAL"
+                               Style="{StaticResource Eyebrow}"
+                               Foreground="{StaticResource Amber}"
+                               FontSize="9.5" />
+                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                        <TextBlock Text="Overview" Style="{StaticResource PageTitle}" FontSize="38" />
+                        <Path Data="M1,10 L14,8 L26,12 L38,9 L48,13"
+                              Stroke="{StaticResource Amber}"
+                              StrokeThickness="2.2"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              Width="52"
+                              Height="16"
+                              Stretch="Fill"
+                              Margin="12,0,0,4"
+                              VerticalAlignment="Bottom" />
+                    </StackPanel>
+                    <TextBlock Text="The whole patient at a glance: four vitals, the busy processes, and the shelves."
+                               Style="{StaticResource MutedText}"
+                               FontSize="13"
+                               Margin="0,3,0,0" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,0,0,3">
+                    <Border Style="{StaticResource Chip}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="6" Height="6" Fill="{StaticResource Lime}" Margin="0,0,6,0">
+                                <Ellipse.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever">
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                 From="1" To="0.35"
+                                                                 Duration="0:0:1.2"
+                                                                 AutoReverse="True" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                            <TextBlock Text="{Binding LastUpdatedText}"
+                                       Style="{StaticResource Eyebrow}"
+                                       FontSize="8.5"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Chip}" Background="{StaticResource AmberSoft}" BorderBrush="{StaticResource Amber}">
+                        <TextBlock Text="60 S WINDOW"
+                                   Style="{StaticResource Eyebrow}"
+                                   FontSize="8.5"
+                                   Foreground="{StaticResource Amber}" />
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- ===================== Four cards ===================== -->
+            <WrapPanel x:Name="CardsPanel" Grid.Row="1" Margin="0,17,0,0" HorizontalAlignment="Left">
+                <!-- CPU -->
+                <Grid Width="292" Margin="0,0,14,14" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <RotateTransform Angle="-0.35" />
+                    </Grid.RenderTransform>
+                    <Border Style="{StaticResource StickerCardHover}"
+                            Background="{StaticResource Panel}"
+                            CornerRadius="17,8,14,10"
+                            Padding="14,13,14,12"
+                            Height="236">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="7" Height="7" Background="{StaticResource Amber}" CornerRadius="2,1,2,1" Margin="0,0,7,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="CPU / LOAD" Style="{StaticResource CardTitle}" Foreground="{StaticResource Amber}" />
+                                </StackPanel>
+                                <Border Style="{StaticResource Chip}" HorizontalAlignment="Right" Padding="6,1" Background="Transparent" BorderBrush="{StaticResource Hairline}">
+                                    <TextBlock Text="01" Style="{StaticResource MonoText}" FontSize="8.5" Foreground="{StaticResource Faint}" />
+                                </Border>
+                            </Grid>
+
+                            <Grid Grid.Row="1" Margin="0,7,0,0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                    <controls:AnimatedNumber Value="{Binding Cpu.Value}"
+                                                             ValueFormat="{Binding Cpu.ValueFormat}"
+                                                             FontFamily="{StaticResource MonoFont}"
+                                                             FontWeight="Bold"
+                                                             FontSize="49"
+                                                             LineHeight="49"
+                                                             Foreground="{StaticResource Amber}" />
+                                    <TextBlock Text="%"
+                                               Style="{StaticResource UnitText}"
+                                               Foreground="{StaticResource Amber}"
+                                               FontSize="16"
+                                               Opacity="0.8" />
+                                </StackPanel>
+                                <Border Style="{StaticResource AlertTag}" DataContext="{Binding Cpu}">
+                                    <TextBlock Text="HOT" Style="{StaticResource Eyebrow}" FontSize="7.5" Foreground="{StaticResource CocoaDeep}" />
+                                </Border>
+                            </Grid>
+
+                            <controls:Sparkline Grid.Row="2"
+                                                Values="{Binding Cpu.History}"
+                                                Stroke="{StaticResource Amber}"
+                                                FixedMaximum="100"
+                                                Height="58"
+                                                Margin="0,5,0,3" />
+
+                            <StackPanel Grid.Row="3">
+                                <TextBlock Text="{Binding Cpu.Detail}" Style="{StaticResource CardDetail}" />
+                                <TextBlock Text="60 seconds of load, one tick per sample" Style="{StaticResource CardSubDetail}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Memory -->
+                <Grid Width="292" Margin="0,0,14,14" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <RotateTransform Angle="0.3" />
+                    </Grid.RenderTransform>
+                    <Border Style="{StaticResource StickerCardHover}"
+                            Background="{StaticResource Panel}"
+                            CornerRadius="8,17,10,15"
+                            Padding="14,13,14,12"
+                            Height="236">
+                        <Grid>
+                            <Border Width="4"
+                                    Background="{StaticResource Lime}"
+                                    CornerRadius="2,3,2,3"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Stretch"
+                                    Margin="-14,2,0,2" />
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Width="7" Height="7" Background="{StaticResource Lime}" CornerRadius="2,1,2,1" Margin="0,0,7,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="MEMORY / PRESSURE" Style="{StaticResource CardTitle}" Foreground="{StaticResource Lime}" />
+                                    </StackPanel>
+                                    <Border Style="{StaticResource Chip}" HorizontalAlignment="Right" Padding="6,1" Background="Transparent" BorderBrush="{StaticResource Hairline}">
+                                        <TextBlock Text="02" Style="{StaticResource MonoText}" FontSize="8.5" Foreground="{StaticResource Faint}" />
+                                    </Border>
+                                </Grid>
+
+                                <Grid Grid.Row="1" Margin="0,7,0,0">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                        <controls:AnimatedNumber Value="{Binding Memory.Value}"
+                                                                 ValueFormat="{Binding Memory.ValueFormat}"
+                                                                 FontFamily="{StaticResource MonoFont}"
+                                                                 FontWeight="Bold"
+                                                                 FontSize="49"
+                                                                 LineHeight="49"
+                                                                 Foreground="{StaticResource Lime}" />
+                                        <TextBlock Text="%"
+                                                   Style="{StaticResource UnitText}"
+                                                   Foreground="{StaticResource Lime}"
+                                                   FontSize="16"
+                                                   Opacity="0.8" />
+                                    </StackPanel>
+                                    <Border Style="{StaticResource AlertTag}" DataContext="{Binding Memory}">
+                                        <TextBlock Text="TIGHT" Style="{StaticResource Eyebrow}" FontSize="7.5" Foreground="{StaticResource CocoaDeep}" />
+                                    </Border>
+                                </Grid>
+
+                                <controls:Sparkline Grid.Row="2"
+                                                    Values="{Binding Memory.History}"
+                                                    Stroke="{StaticResource Lime}"
+                                                    FixedMaximum="100"
+                                                    Height="58"
+                                                    Margin="0,5,0,3" />
+
+                                <StackPanel Grid.Row="3">
+                                    <TextBlock Text="{Binding Memory.Detail}" Style="{StaticResource CardDetail}" />
+                                    <TextBlock Text="{Binding Memory.SecondaryDetail}" Style="{StaticResource CardSubDetail}" />
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Disk -->
+                <Grid Width="292" Margin="0,0,14,14" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <RotateTransform Angle="-0.18" />
+                    </Grid.RenderTransform>
+                    <Border Style="{StaticResource StickerCardHover}"
+                            Background="{StaticResource PanelRaised}"
+                            CornerRadius="14,11,18,7"
+                            Padding="14,13,14,12"
+                            Height="236">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="7" Height="7" Background="{StaticResource Pink}" CornerRadius="2,1,2,1" Margin="0,0,7,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="DISK / ACTIVITY" Style="{StaticResource CardTitle}" Foreground="{StaticResource Pink}" />
+                                </StackPanel>
+                                <Border Style="{StaticResource Chip}" HorizontalAlignment="Right" Padding="6,1" Background="Transparent" BorderBrush="{StaticResource Hairline}">
+                                    <TextBlock Text="03" Style="{StaticResource MonoText}" FontSize="8.5" Foreground="{StaticResource Faint}" />
+                                </Border>
+                            </Grid>
+
+                            <Grid Grid.Row="1" Margin="0,7,0,0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                    <controls:AnimatedNumber Value="{Binding Disk.Value}"
+                                                             ValueFormat="{Binding Disk.ValueFormat}"
+                                                             FontFamily="{StaticResource MonoFont}"
+                                                             FontWeight="Bold"
+                                                             FontSize="49"
+                                                             LineHeight="49"
+                                                             Foreground="{StaticResource Pink}" />
+                                    <TextBlock Text="%"
+                                               Style="{StaticResource UnitText}"
+                                               Foreground="{StaticResource Pink}"
+                                               FontSize="16"
+                                               Opacity="0.8" />
+                                </StackPanel>
+                                <Border Style="{StaticResource AlertTag}" DataContext="{Binding Disk}">
+                                    <TextBlock Text="BUSY" Style="{StaticResource Eyebrow}" FontSize="7.5" Foreground="{StaticResource CocoaDeep}" />
+                                </Border>
+                            </Grid>
+
+                            <controls:Sparkline Grid.Row="2"
+                                                Values="{Binding Disk.History}"
+                                                Stroke="{StaticResource Pink}"
+                                                FixedMaximum="100"
+                                                Height="58"
+                                                Margin="0,5,0,3" />
+
+                            <StackPanel Grid.Row="3">
+                                <TextBlock Text="{Binding Disk.Detail}" Style="{StaticResource CardDetail}" />
+                                <TextBlock Text="{Binding Disk.SecondaryDetail}" Style="{StaticResource CardSubDetail}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Network -->
+                <Grid Width="292" Margin="0,0,14,14" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <RotateTransform Angle="0.4" />
+                    </Grid.RenderTransform>
+                    <Border Style="{StaticResource StickerCardHover}"
+                            Background="{StaticResource Panel}"
+                            CornerRadius="10,16,8,17"
+                            Padding="14,13,14,12"
+                            Height="236">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Grid>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="7" Height="7" Background="{StaticResource Sky}" CornerRadius="2,1,2,1" Margin="0,0,7,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="NETWORK / FLOW" Style="{StaticResource CardTitle}" FontSize="8.5" Foreground="{StaticResource Sky}" />
+                                </StackPanel>
+                                <ComboBox Style="{StaticResource StickerComboBox}"
+                                          ItemsSource="{Binding Network.NetworkAdapters}"
+                                          SelectedItem="{Binding Network.SelectedAdapter, Mode=TwoWay}"
+                                          HorizontalAlignment="Right"
+                                          Width="126"
+                                          ToolTip="{Binding Network.SelectedAdapter.Description}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontFamily="{StaticResource DisplayFont}"
+                                                       FontSize="10.5"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+
+                            <Grid Grid.Row="1" Margin="0,7,0,0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                    <controls:AnimatedNumber Value="{Binding Network.Value}"
+                                                             ValueFormat="{Binding Network.ValueFormat}"
+                                                             FontFamily="{StaticResource MonoFont}"
+                                                             FontWeight="Bold"
+                                                             FontSize="49"
+                                                             LineHeight="49"
+                                                             Foreground="{StaticResource Sky}" />
+                                    <TextBlock Text="{Binding Network.ValueUnit}"
+                                               Style="{StaticResource UnitText}"
+                                               Foreground="{StaticResource Sky}"
+                                               FontSize="12"
+                                               Opacity="0.8" />
+                                </StackPanel>
+                            </Grid>
+
+                            <controls:Sparkline Grid.Row="2"
+                                                Values="{Binding Network.History}"
+                                                Stroke="{StaticResource Sky}"
+                                                FixedMaximum="0"
+                                                Height="58"
+                                                Margin="0,5,0,3" />
+
+                            <StackPanel Grid.Row="3">
+                                <Grid>
+                                    <TextBlock Text="{Binding Network.Detail}" Style="{StaticResource CardDetail}" Foreground="{StaticResource Sky}" />
+                                    <TextBlock Text="DOWN" Style="{StaticResource Eyebrow}" FontSize="7.5" HorizontalAlignment="Right" Foreground="{StaticResource Faint}" />
+                                </Grid>
+                                <TextBlock Text="{Binding Network.SecondaryDetail}" Style="{StaticResource CardSubDetail}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </WrapPanel>
+
+            <!-- ===================== Lower shelves ===================== -->
+            <Grid Grid.Row="2" Margin="0,17,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.5*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Processes -->
+                <Border Grid.Column="0"
+                        Style="{StaticResource StickerCard}"
+                        Background="{StaticResource Panel}"
+                        CornerRadius="9,15,11,18"
+                        Padding="17,15"
+                        Margin="0,0,16,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="TOP PROCESSES" Style="{StaticResource CardTitle}" Foreground="{StaticResource Amber}" />
+                                <TextBlock Text="busiest first, by CPU share" Style="{StaticResource CardSubDetail}" Margin="0,2,0,0" />
+                            </StackPanel>
+                            <Border Style="{StaticResource Chip}" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                <TextBlock Text="CPU DELTAS" Style="{StaticResource Eyebrow}" FontSize="8" Foreground="{StaticResource Muted}" />
+                            </Border>
+                        </Grid>
+
+                        <Grid Grid.Row="1" Margin="0,12,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2.1*" />
+                                <ColumnDefinition Width="0.6*" />
+                                <ColumnDefinition Width="0.7*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="PROCESS" Style="{StaticResource Eyebrow}" FontSize="8" />
+                            <TextBlock Grid.Column="1" Text="CPU" Style="{StaticResource Eyebrow}" FontSize="8" TextAlignment="Right" />
+                            <TextBlock Grid.Column="2" Text="MEM" Style="{StaticResource Eyebrow}" FontSize="8" TextAlignment="Right" />
+                        </Grid>
+
+                        <ItemsControl Grid.Row="2" ItemsSource="{Binding TopProcesses}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="28" />
+                                            <RowDefinition Height="1" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2.1*" />
+                                            <ColumnDefinition Width="0.6*" />
+                                            <ColumnDefinition Width="0.7*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid VerticalAlignment="Center" ToolTip="{Binding Path}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="4" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Width="3" Height="14" Background="{StaticResource Amber}" CornerRadius="1,2,1,2" VerticalAlignment="Center" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0">
+                                                <TextBlock Text="{Binding Name}" Style="{StaticResource BodyText}" FontSize="12.5" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding Pid, StringFormat={}#{0}}" Style="{StaticResource MonoText}" FontSize="9" Foreground="{StaticResource Faint}" Margin="7,2,0,0" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding CpuPercent, StringFormat={}{0:0.0}%}"
+                                                   Style="{StaticResource MonoText}"
+                                                   FontSize="10.5"
+                                                   Foreground="{StaticResource Amber}"
+                                                   TextAlignment="Right"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding MemoryMb, StringFormat={}{0:0} MB}"
+                                                   Style="{StaticResource MonoText}"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource Muted}"
+                                                   TextAlignment="Right"
+                                                   VerticalAlignment="Center" />
+                                        <Rectangle Grid.Row="1" Grid.ColumnSpan="3" Style="{StaticResource DashRule}" Opacity="0.55" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Grid.Row="2"
+                                   Text="No processes to show yet. They are being counted."
+                                   Margin="0,12,0,0">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource SmallMuted}">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasProcesses}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Storage -->
+                    <Border Style="{StaticResource StickerCard}"
+                            Background="{StaticResource Panel}"
+                            CornerRadius="15,8,13,10"
+                            Padding="16,14">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Grid>
+                                <TextBlock Text="STORAGE SHELVES" Style="{StaticResource CardTitle}" Foreground="{StaticResource Pink}" />
+                                <TextBlock Text="{Binding MoreDrivesText}" Style="{StaticResource CardSubDetail}" HorizontalAlignment="Right" Margin="0" />
+                            </Grid>
+
+                            <ItemsControl Grid.Row="1" ItemsSource="{Binding Drives}" Margin="0,9,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,0,0,9">
+                                            <Grid>
+                                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource BodyText}" FontSize="11.5" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding UsageText}" Style="{StaticResource MonoText}" FontSize="9.5" Foreground="{StaticResource Pink}" HorizontalAlignment="Right" />
+                                            </Grid>
+                                            <ProgressBar Value="{Binding UsedPercent, Mode=OneWay}"
+                                                         Margin="0,4,0,3"
+                                                         Height="8">
+                                                <ProgressBar.Style>
+                                                    <Style TargetType="ProgressBar" BasedOn="{StaticResource MeterBar}">
+                                                        <Setter Property="Foreground" Value="{StaticResource Pink}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsNearlyFull}" Value="True">
+                                                                <Setter Property="Foreground" Value="{StaticResource Alert}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ProgressBar.Style>
+                                            </ProgressBar>
+                                            <Grid>
+                                                <TextBlock Text="{Binding FreeText, StringFormat={}{0} free}" Style="{StaticResource SmallMuted}" FontSize="8.5" />
+                                                <TextBlock Text="{Binding Format}" Style="{StaticResource Eyebrow}" FontSize="7.5" HorizontalAlignment="Right" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <TextBlock Grid.Row="2"
+                                       Text="No fixed drives answered the roll call."
+                                       Margin="0,4,0,0">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource SmallMuted}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasDrives}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </Border>
+
+                    <!-- Temperature placeholder (wired up properly in the sensor phase). -->
+                    <Border Grid.Row="1"
+                            Style="{StaticResource StickerCard}"
+                            Background="{StaticResource PanelRaised}"
+                            CornerRadius="8,13,10,16"
+                            Padding="16,14"
+                            Margin="0,16,0,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <TextBlock Text="TEMPERATURES" Style="{StaticResource CardTitle}" Foreground="{StaticResource Alert}" />
+                                <Border Style="{StaticResource Chip}" HorizontalAlignment="Right" Padding="6,1" Background="{StaticResource AlertSoft}" BorderBrush="{StaticResource Alert}">
+                                    <TextBlock Text="SENSORS" Style="{StaticResource Eyebrow}" FontSize="7.5" Foreground="{StaticResource Alert}" />
+                                </Border>
+                            </Grid>
+
+                            <Grid Grid.Row="1" Margin="0,10,0,0">
+                                <Border Background="{StaticResource Inset}" BorderBrush="{StaticResource Hairline}" BorderThickness="1.5" CornerRadius="8,5,9,6" Padding="12">
+                                    <StackPanel VerticalAlignment="Center">
+                                        <Path Data="{StaticResource IconSensors}"
+                                              Stroke="{StaticResource Alert}"
+                                              StrokeThickness="1.5"
+                                              Width="23" Height="23"
+                                              Stretch="Uniform"
+                                              HorizontalAlignment="Left" />
+                                        <TextBlock Text="{Binding TemperatureNotice}"
+                                                   Style="{StaticResource SmallMuted}"
+                                                   FontSize="10.5"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,7,0,0" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

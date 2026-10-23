@@ -9,10 +9,10 @@
         Width="1440"
         Height="940"
         MinWidth="1120"
-        MinHeight="720"
+        MinHeight="640"
         WindowStyle="None"
         ResizeMode="CanResize"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="Manual"
         Style="{StaticResource PulseWindow}"
         Icon="pack://application:,,,/Assets/PulsePal.ico"
         Closing="Window_Closing">
@@ -119,14 +119,14 @@
                                 <Canvas Width="23" Height="23" Margin="0,0,8,0">
                                     <Ellipse Canvas.Left="1.5" Canvas.Top="1.5"
                                              Width="20" Height="20"
-                                             Stroke="{StaticResource Amber}"
+                                             Stroke="{Binding MoodAccent}"
                                              StrokeThickness="1.8" />
                                     <Path Data="M8,9.2 L8.2,9.2 M15.5,9.2 L15.7,9.2"
                                           Stroke="{StaticResource Cream}"
                                           StrokeThickness="2"
                                           StrokeStartLineCap="Round"
                                           StrokeEndLineCap="Round" />
-                                    <Path Data="M7.5,13.9 C9.5,16.1 14.4,16.1 16.5,13.7"
+                                    <Path Data="{Binding MoodMouth}"
                                           Stroke="{StaticResource Cream}"
                                           StrokeThickness="1.7"
                                           StrokeStartLineCap="Round"
@@ -139,7 +139,7 @@
                                                    Style="{StaticResource BaseText}"
                                                    FontWeight="SemiBold"
                                                    FontSize="13"
-                                                   Foreground="{StaticResource Amber}" />
+                                                   Foreground="{Binding MoodAccent}" />
                                         <TextBlock Text="{Binding MoodDetail}"
                                                    Style="{StaticResource SmallMuted}"
                                                    FontSize="10.5"
@@ -251,165 +251,7 @@
                 </Grid>
 
                 <!-- ===================== Page content ===================== -->
-                <Grid Grid.Row="2" Margin="24,18,24,22">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <Grid Margin="2,0,2,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <TextBlock Text="{Binding SelectedNav.Kicker}"
-                                       Style="{StaticResource Eyebrow}"
-                                       Foreground="{StaticResource Amber}"
-                                       FontSize="9.5"
-                                       Margin="0,0,0,5" />
-                            <TextBlock Text="{Binding SelectedNav.Label}"
-                                       Style="{StaticResource PageTitle}" />
-                        </StackPanel>
-                        <Border Grid.Column="1" Style="{StaticResource Chip}" VerticalAlignment="Bottom" Margin="0,0,0,4">
-                            <TextBlock Text="BENCH ONLINE / PHASE 1"
-                                       Style="{StaticResource Eyebrow}"
-                                       FontSize="9"
-                                       Foreground="{StaticResource Muted}" />
-                        </Border>
-                    </Grid>
-
-                    <Border Grid.Row="1" Style="{StaticResource StickerCard}" Padding="0">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1.35*" />
-                                <ColumnDefinition Width="1*" />
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Margin="38,34,30,34" VerticalAlignment="Center">
-                                <Border Style="{StaticResource Chip}" HorizontalAlignment="Left" Background="{StaticResource AmberSoft}" BorderBrush="{StaticResource Amber}" Margin="0,0,0,18">
-                                    <TextBlock Text="THE FRAME IS UP"
-                                               Style="{StaticResource Eyebrow}"
-                                               Foreground="{StaticResource Amber}"
-                                               FontSize="9.5" />
-                                </Border>
-                                <TextBlock Style="{StaticResource DisplayText}"
-                                           FontSize="46"
-                                           TextWrapping="Wrap"
-                                           MaxWidth="530"
-                                           HorizontalAlignment="Left">
-                                    <Run Text="A health dashboard with" />
-                                    <Run Text=" gravy on it." Foreground="{StaticResource Amber}" />
-                                </TextBlock>
-                                <TextBlock Style="{StaticResource MutedText}"
-                                           FontSize="14"
-                                           MaxWidth="520"
-                                           Margin="0,15,0,0"
-                                           TextWrapping="Wrap">
-                                    Warm cocoa, chunky outlines, and live machine vitals. The bench and tabs are wired; measurements arrive in the next phase.
-                                </TextBlock>
-                                <StackPanel Orientation="Horizontal" Margin="0,24,0,0">
-                                    <Border Background="{StaticResource Amber}" BorderBrush="{StaticResource Cream}" BorderThickness="2" CornerRadius="5,3,6,4" Padding="12,5" Margin="0,0,8,0">
-                                        <TextBlock Text="CPU" Style="{StaticResource Eyebrow}" Foreground="{StaticResource CocoaDeep}" FontSize="9" />
-                                    </Border>
-                                    <Border Background="{StaticResource Lime}" BorderBrush="{StaticResource Cream}" BorderThickness="2" CornerRadius="5,3,6,4" Padding="12,5" Margin="0,0,8,0">
-                                        <TextBlock Text="MEMORY" Style="{StaticResource Eyebrow}" Foreground="{StaticResource CocoaDeep}" FontSize="9" />
-                                    </Border>
-                                    <Border Background="{StaticResource Pink}" BorderBrush="{StaticResource Cream}" BorderThickness="2" CornerRadius="5,3,6,4" Padding="12,5" Margin="0,0,8,0">
-                                        <TextBlock Text="DISK" Style="{StaticResource Eyebrow}" Foreground="{StaticResource CocoaDeep}" FontSize="9" />
-                                    </Border>
-                                    <Border Background="{StaticResource Sky}" BorderBrush="{StaticResource Cream}" BorderThickness="2" CornerRadius="5,3,6,4" Padding="12,5">
-                                        <TextBlock Text="NETWORK" Style="{StaticResource Eyebrow}" Foreground="{StaticResource CocoaDeep}" FontSize="9" />
-                                    </Border>
-                                </StackPanel>
-                            </StackPanel>
-
-                            <Grid Grid.Column="1" Margin="0" Background="{StaticResource PanelSoft}">
-                                <Canvas IsHitTestVisible="False">
-                                    <Path Data="M0,80 C60,20 95,140 160,74 C220,14 265,108 340,45"
-                                          Stroke="{StaticResource Hairline}"
-                                          StrokeThickness="2"
-                                          StrokeDashArray="2,7"
-                                          Width="350"
-                                          Height="160"
-                                          Canvas.Left="-20"
-                                          Canvas.Top="40"
-                                          Stretch="Fill" />
-                                    <Path Data="M30,280 L130,222 L78,348 L205,260 L150,415"
-                                          Stroke="{StaticResource AmberSoft}"
-                                          StrokeThickness="2"
-                                          Width="220"
-                                          Height="220"
-                                          Stretch="Fill"
-                                          Canvas.Left="80"
-                                          Canvas.Top="300" />
-                                </Canvas>
-
-                                <Border Style="{StaticResource StickerCard}"
-                                        Background="{StaticResource PanelRaised}"
-                                        Width="255"
-                                        Height="166"
-                                        Padding="18"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        RenderTransformOrigin="0.5,0.5">
-                                    <Border.RenderTransform>
-                                        <RotateTransform Angle="-2.5" />
-                                    </Border.RenderTransform>
-                                    <StackPanel>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,16">
-                                            <Path Data="{StaticResource IconPulse}"
-                                                  Stroke="{StaticResource Amber}"
-                                                  StrokeThickness="2"
-                                                  Width="37" Height="16"
-                                                  Stretch="Fill" />
-                                        </StackPanel>
-                                        <TextBlock Text="READY WHEN YOU ARE"
-                                                   Style="{StaticResource Eyebrow}"
-                                                   FontSize="9"
-                                                   Foreground="{StaticResource Muted}" />
-                                        <TextBlock Text="no fake gauges here"
-                                                   Style="{StaticResource BaseText}"
-                                                   FontSize="21"
-                                                   FontWeight="ExtraBold"
-                                                   Margin="0,5,0,0" />
-                                        <Rectangle Style="{StaticResource DashRule}" Margin="0,14,0,10" />
-                                        <TextBlock Text="01 / SHELL"
-                                                   Style="{StaticResource MonoText}"
-                                                   Foreground="{StaticResource Amber}"
-                                                   FontSize="11" />
-                                    </StackPanel>
-                                </Border>
-
-                                <Border Width="72" Height="72"
-                                        Background="{StaticResource Lime}"
-                                        BorderBrush="{StaticResource Cream}"
-                                        BorderThickness="2"
-                                        CornerRadius="36,30,34,31"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Top"
-                                        Margin="0,30,34,0"
-                                        RenderTransformOrigin="0.5,0.5">
-                                    <Border.RenderTransform>
-                                        <RotateTransform Angle="8" />
-                                    </Border.RenderTransform>
-                                    <TextBlock Text="hi"
-                                               Style="{StaticResource BaseText}"
-                                               Foreground="{StaticResource CocoaDeep}"
-                                               FontWeight="ExtraBold"
-                                               FontSize="22"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               RenderTransformOrigin="0.5,0.5">
-                                        <TextBlock.RenderTransform>
-                                            <RotateTransform Angle="-8" />
-                                        </TextBlock.RenderTransform>
-                                    </TextBlock>
-                                </Border>
-                            </Grid>
-                        </Grid>
-                    </Border>
-                </Grid>
+                <ContentControl Grid.Row="2" Content="{Binding CurrentPage}" />
             </Grid>
         </Grid>
     </Border>
