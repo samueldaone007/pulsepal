@@ -27,15 +27,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly DispatcherTimer _clockTimer;
     private readonly Dictionary<string, PlaceholderPageViewModel> _placeholderPages = [];
     private double _smoothedLoad = -1;
-    private IProcessService _processService;
-    private ProcessesViewModel _processesViewModel;
+    private readonly ProcessesViewModel _processesViewModel;
 
-    public MainViewModel(ISamplingService samplingService, OverviewViewModel overview, IProcessService processService)
+    public MainViewModel(ISamplingService samplingService, OverviewViewModel overview, IProcessService processService, IDialogService dialogService)
     {
         _samplingService = samplingService;
         _overview = overview;
-        _processService = processService;
-        _processesViewModel = new ProcessesViewModel(processService);
+        _processesViewModel = new ProcessesViewModel(processService, dialogService);
         _dispatcher = Dispatcher.CurrentDispatcher;
 
         NavItems =
@@ -199,12 +197,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private void BuildPlaceholderPages()
     {
-        _placeholderPages["processes"] = new PlaceholderPageViewModel(
-            "Processes",
-            "PROCESS BENCH / NEXT UP",
-            "The process table is being sanded and sorted. Soon: search, CPU deltas, and a polite confirmation before ending anything.",
-            "#FFB020");
-
         _placeholderPages["performance"] = new PlaceholderPageViewModel(
             "Performance",
             "BIG CHARTS / NEXT UP",

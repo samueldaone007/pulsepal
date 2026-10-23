@@ -5,66 +5,185 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Margin="24,16,24,28">
+    <UserControl.Resources>
+        <Style x:Key="SortHeaderButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource Muted}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="Transparent" Padding="0,2">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource Cream}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="24,14,24,24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel>
-            <TextBlock Text="PROCESS BENCH / LIVE"
-                       Style="{StaticResource Eyebrow}"
-                       Foreground="{StaticResource Amber}"
-                       FontSize="9.5" />
-            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                <TextBlock Text="Processes"
-                           Style="{StaticResource PageTitle}"
-                           FontSize="38" />
-                <Path Data="M1,10 L14,8 L26,12 L38,9 L48,13"
-                      Stroke="{StaticResource Amber}"
-                      StrokeThickness="2.2"
-                      StrokeStartLineCap="Round"
-                      StrokeEndLineCap="Round"
-                      Width="52"
-                      Height="16"
-                      Stretch="Fill"
-                      Margin="12,0,0,4"
-                      VerticalAlignment="Bottom" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel VerticalAlignment="Bottom">
+                <TextBlock Text="PROCESS BENCH / LIVE"
+                           Style="{StaticResource Eyebrow}"
+                           Foreground="{StaticResource Amber}"
+                           FontSize="9" />
+                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                    <TextBlock Text="Processes"
+                               Style="{StaticResource PageTitle}"
+                               FontSize="34" />
+                    <Path Data="M1,10 L14,8 L26,12 L38,9 L48,13"
+                          Stroke="{StaticResource Amber}"
+                          StrokeThickness="2.2"
+                          StrokeStartLineCap="Round"
+                          StrokeEndLineCap="Round"
+                          Width="48"
+                          Height="15"
+                          Stretch="Fill"
+                          Margin="11,0,0,4"
+                          VerticalAlignment="Bottom" />
+                </StackPanel>
+                <TextBlock Text="Every process, one room."
+                           Style="{StaticResource MutedText}"
+                           FontSize="12.5"
+                           Margin="0,2,0,0" />
             </StackPanel>
-            <TextBlock Text="Everything currently breathing, ordered by CPU share."
-                       Style="{StaticResource MutedText}"
-                       FontSize="13"
-                       Margin="0,3,0,0" />
-        </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Bottom"
+                        Margin="14,0,0,0">
+                <Grid Width="220" VerticalAlignment="Center" Margin="0,0,10,0">
+                    <TextBox Style="{StaticResource SearchBox}"
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="Filter by process name, PID, or executable path"
+                             Padding="11,6" />
+                    <TextBlock Text="search name, pid, or path"
+                               Margin="12,0,0,0"
+                               VerticalAlignment="Center"
+                               IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource SmallMuted}">
+                                <Setter Property="FontSize" Value="10.5" />
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SearchText}" Value="">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+
+                <Button Style="{StaticResource DangerButton}"
+                        Content="END SELECTED"
+                        Command="{Binding EndSelectedCommand}"
+                        Padding="12,7"
+                        FontSize="11"
+                        VerticalAlignment="Center"
+                        ToolTip="End the selected process after a confirmation" />
+            </StackPanel>
+        </Grid>
 
         <Border Grid.Row="1"
                 Style="{StaticResource StickerCard}"
                 Background="{StaticResource Panel}"
                 CornerRadius="9,15,11,18"
-                Padding="18,16"
-                Margin="0,18,0,0">
+                Padding="14,10"
+                Margin="0,10,0,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Grid Margin="0,0,0,8">
+                <Grid Margin="0,0,0,5">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2.3*" />
-                        <ColumnDefinition Width="0.7*" />
+                        <ColumnDefinition Width="3.2*" />
                         <ColumnDefinition Width="0.8*" />
+                        <ColumnDefinition Width="1.0*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="PROCESS" Style="{StaticResource Eyebrow}" FontSize="8.5" />
-                    <TextBlock Grid.Column="1" Text="CPU" Style="{StaticResource Eyebrow}" FontSize="8.5" TextAlignment="Right" />
-                    <TextBlock Grid.Column="2" Text="MEMORY" Style="{StaticResource Eyebrow}" FontSize="8.5" TextAlignment="Right" />
+
+                    <Button Style="{StaticResource SortHeaderButton}"
+                            Command="{Binding SortByCommand}"
+                            CommandParameter="Name">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="PROCESS"
+                                       Style="{StaticResource Eyebrow}"
+                                       FontSize="8.5"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                            <TextBlock Text="{Binding NameSortGlyph}"
+                                       Style="{StaticResource MonoText}"
+                                       FontSize="9"
+                                       Foreground="{StaticResource Amber}" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Grid.Column="1"
+                            Style="{StaticResource SortHeaderButton}"
+                            Command="{Binding SortByCommand}"
+                            CommandParameter="Cpu"
+                            HorizontalContentAlignment="Right">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="CPU"
+                                       Style="{StaticResource Eyebrow}"
+                                       FontSize="8.5"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                            <TextBlock Text="{Binding CpuSortGlyph}"
+                                       Style="{StaticResource MonoText}"
+                                       FontSize="9"
+                                       Foreground="{StaticResource Amber}" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Grid.Column="2"
+                            Style="{StaticResource SortHeaderButton}"
+                            Command="{Binding SortByCommand}"
+                            CommandParameter="Memory"
+                            HorizontalContentAlignment="Right">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="MEMORY"
+                                       Style="{StaticResource Eyebrow}"
+                                       FontSize="8.5"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                            <TextBlock Text="{Binding MemorySortGlyph}"
+                                       Style="{StaticResource MonoText}"
+                                       FontSize="9"
+                                       Foreground="{StaticResource Amber}" />
+                        </StackPanel>
+                    </Button>
                 </Grid>
 
                 <ListBox Grid.Row="1"
-                         ItemsSource="{Binding TopProcesses}"
+                         ItemsSource="{Binding ItemsView}"
+                         SelectedItem="{Binding SelectedProcess, Mode=TwoWay}"
+                         SelectionMode="Single"
                          Background="Transparent"
                          BorderThickness="0"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         VirtualizingPanel.VirtualizationMode="Recycling">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -77,7 +196,7 @@
                                     <ControlTemplate TargetType="ListBoxItem">
                                         <Border x:Name="Row"
                                                 Background="Transparent"
-                                                Padding="0,7">
+                                                Padding="0,1">
                                             <ContentPresenter />
                                         </Border>
                                         <ControlTemplate.Triggers>
@@ -95,48 +214,96 @@
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Grid>
+                            <Grid ToolTip="{Binding Path}">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="28" />
+                                    <RowDefinition Height="24" />
                                     <RowDefinition Height="1" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2.3*" />
-                                    <ColumnDefinition Width="0.7*" />
+                                    <ColumnDefinition Width="3.2*" />
                                     <ColumnDefinition Width="0.8*" />
+                                    <ColumnDefinition Width="1.0*" />
                                 </Grid.ColumnDefinitions>
 
-                                <Grid VerticalAlignment="Center" ToolTip="{Binding Path}">
+                                <Grid VerticalAlignment="Center">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="4" />
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <Border Width="3" Height="15" Background="{StaticResource Amber}" CornerRadius="1,2,1,2" VerticalAlignment="Center" />
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="9,0,0,0">
-                                        <TextBlock Text="{Binding Name}" Style="{StaticResource BodyText}" FontSize="13" TextTrimming="CharacterEllipsis" />
-                                        <TextBlock Text="{Binding Pid, StringFormat={}#{0}}" Style="{StaticResource MonoText}" FontSize="9.5" Foreground="{StaticResource Faint}" Margin="8,2,0,0" />
-                                    </StackPanel>
+                                    <Border Width="3"
+                                            Height="13"
+                                            Background="{StaticResource Amber}"
+                                            CornerRadius="1,2,1,2"
+                                            VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Name}"
+                                               Style="{StaticResource BodyText}"
+                                               FontSize="12"
+                                               TextTrimming="CharacterEllipsis"
+                                               Margin="9,0,0,0" />
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding Pid, StringFormat={}#{0}}"
+                                               Style="{StaticResource MonoText}"
+                                               FontSize="8.5"
+                                               Foreground="{StaticResource Faint}"
+                                               Margin="9,1,0,0" />
+                                    <Path Grid.Column="3"
+                                          Data="M4,7 L4,5.7 C4,3.7 5.6,2.1 7.6,2.1 C9.6,2.1 11.2,3.7 11.2,5.7 L11.2,7 M3,7 L12.2,7 L12.2,13.4 L3,13.4 Z"
+                                          Stroke="{StaticResource Faint}"
+                                          StrokeThickness="1.2"
+                                          Width="9"
+                                          Height="11"
+                                          Stretch="Uniform"
+                                          Margin="7,0,0,0"
+                                          VerticalAlignment="Center"
+                                          Visibility="{Binding IsProtected, Converter={StaticResource BoolToVisibility}}"
+                                          ToolTip="Protected or internal / cannot be ended" />
                                 </Grid>
 
                                 <TextBlock Grid.Column="1"
                                            Text="{Binding CpuPercent, StringFormat={}{0:0.0}%}"
                                            Style="{StaticResource MonoText}"
-                                           FontSize="11"
+                                           FontSize="10"
                                            Foreground="{StaticResource Amber}"
                                            TextAlignment="Right"
                                            VerticalAlignment="Center" />
                                 <TextBlock Grid.Column="2"
                                            Text="{Binding MemoryMb, StringFormat={}{0:0} MB}"
                                            Style="{StaticResource MonoText}"
-                                           FontSize="10.5"
+                                           FontSize="9.5"
                                            Foreground="{StaticResource Muted}"
                                            TextAlignment="Right"
                                            VerticalAlignment="Center" />
-                                <Rectangle Grid.Row="1" Grid.ColumnSpan="3" Style="{StaticResource DashRule}" Opacity="0.55" />
+                                <Rectangle Grid.Row="1"
+                                           Grid.ColumnSpan="3"
+                                           Style="{StaticResource DashRule}"
+                                           Opacity="0.55" />
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+
+                <Grid Grid.Row="2" Margin="0,6,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding FooterText}"
+                               Style="{StaticResource SmallMuted}"
+                               FontSize="10"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding StatusText}"
+                               Style="{StaticResource MonoText}"
+                               FontSize="8.5"
+                               Foreground="{StaticResource Faint}"
+                               TextTrimming="CharacterEllipsis"
+                               Margin="10,0,0,0"
+                               VerticalAlignment="Center" />
+                </Grid>
             </Grid>
         </Border>
     </Grid>
