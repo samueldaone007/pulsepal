@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\PulsePal.ico</ApplicationIcon>
+    <AssemblyName>PulsePal</AssemblyName>
+    <RootNamespace>PulsePal</RootNamespace>
+    <Version>1.0.0</Version>
+    <Authors>PulsePal</Authors>
+    <Description>A warm, hand-made local PC health dashboard.</Description>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.1" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- WinForms is only for the tray icon. Keep its implicit usings out of WPF files. -->
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Fonts\*.ttf" />
+    <Resource Include="Assets\PulsePal.ico" />
+  </ItemGroup>
+
+</Project>
