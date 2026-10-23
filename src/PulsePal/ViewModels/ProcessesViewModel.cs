@@ -14,8 +14,13 @@ public partial class ProcessesViewModel : ObservableObject
     public ProcessesViewModel(IProcessService processService)
     {
         _processService = processService;
-        var samples = processService.Sample();
-        foreach (var p in samples.Take(6))
+        ApplyProcesses(processService.Sample());
+    }
+
+    public void ApplyProcesses(IReadOnlyList<ProcessSample> processes)
+    {
+        TopProcesses.Clear();
+        foreach (var p in processes.Take(6))
         {
             TopProcesses.Add(p);
         }

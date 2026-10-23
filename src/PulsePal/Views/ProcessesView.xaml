@@ -5,32 +5,139 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <TextBlock Text="TOP PROCESSES"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   FontSize="18"
-                   Margin="0,10"/>
-        <ListBox HorizontalAlignment="Stretch"
-                 VerticalAlignment="Stretch"
-                 ItemsSource="{Binding TopProcesses}"
-                 Margin="20"
-                 SelectionMode="Single">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Name}"
-                                   Width="120"
-                                   Margin="5"/>
-                        <TextBlock Text="{Binding CpuPercent, StringFormat={}{0:0.0}%}"
-                                   Width="60"
-                                   Margin="5"/>
-                        <TextBlock Text="{Binding MemoryMb, StringFormat={}{0} MB}"
-                                   Width="70"
-                                   Margin="5"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+    <Grid Margin="24,16,24,28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="PROCESS BENCH / LIVE"
+                       Style="{StaticResource Eyebrow}"
+                       Foreground="{StaticResource Amber}"
+                       FontSize="9.5" />
+            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                <TextBlock Text="Processes"
+                           Style="{StaticResource PageTitle}"
+                           FontSize="38" />
+                <Path Data="M1,10 L14,8 L26,12 L38,9 L48,13"
+                      Stroke="{StaticResource Amber}"
+                      StrokeThickness="2.2"
+                      StrokeStartLineCap="Round"
+                      StrokeEndLineCap="Round"
+                      Width="52"
+                      Height="16"
+                      Stretch="Fill"
+                      Margin="12,0,0,4"
+                      VerticalAlignment="Bottom" />
+            </StackPanel>
+            <TextBlock Text="Everything currently breathing, ordered by CPU share."
+                       Style="{StaticResource MutedText}"
+                       FontSize="13"
+                       Margin="0,3,0,0" />
+        </StackPanel>
+
+        <Border Grid.Row="1"
+                Style="{StaticResource StickerCard}"
+                Background="{StaticResource Panel}"
+                CornerRadius="9,15,11,18"
+                Padding="18,16"
+                Margin="0,18,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2.3*" />
+                        <ColumnDefinition Width="0.7*" />
+                        <ColumnDefinition Width="0.8*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="PROCESS" Style="{StaticResource Eyebrow}" FontSize="8.5" />
+                    <TextBlock Grid.Column="1" Text="CPU" Style="{StaticResource Eyebrow}" FontSize="8.5" TextAlignment="Right" />
+                    <TextBlock Grid.Column="2" Text="MEMORY" Style="{StaticResource Eyebrow}" FontSize="8.5" TextAlignment="Right" />
+                </Grid>
+
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding TopProcesses}"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="0" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Row"
+                                                Background="Transparent"
+                                                Padding="0,7">
+                                            <ContentPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Row" Property="Background" Value="{StaticResource PanelHover}" />
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Row" Property="Background" Value="{StaticResource PanelHover}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="28" />
+                                    <RowDefinition Height="1" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2.3*" />
+                                    <ColumnDefinition Width="0.7*" />
+                                    <ColumnDefinition Width="0.8*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Grid VerticalAlignment="Center" ToolTip="{Binding Path}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="4" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Width="3" Height="15" Background="{StaticResource Amber}" CornerRadius="1,2,1,2" VerticalAlignment="Center" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="9,0,0,0">
+                                        <TextBlock Text="{Binding Name}" Style="{StaticResource BodyText}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding Pid, StringFormat={}#{0}}" Style="{StaticResource MonoText}" FontSize="9.5" Foreground="{StaticResource Faint}" Margin="8,2,0,0" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding CpuPercent, StringFormat={}{0:0.0}%}"
+                                           Style="{StaticResource MonoText}"
+                                           FontSize="11"
+                                           Foreground="{StaticResource Amber}"
+                                           TextAlignment="Right"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding MemoryMb, StringFormat={}{0:0} MB}"
+                                           Style="{StaticResource MonoText}"
+                                           FontSize="10.5"
+                                           Foreground="{StaticResource Muted}"
+                                           TextAlignment="Right"
+                                           VerticalAlignment="Center" />
+                                <Rectangle Grid.Row="1" Grid.ColumnSpan="3" Style="{StaticResource DashRule}" Opacity="0.55" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

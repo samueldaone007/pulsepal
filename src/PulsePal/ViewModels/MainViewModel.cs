@@ -142,6 +142,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
         {
             _overview.ApplyProcesses(processes);
+            _processesViewModel.ApplyProcesses(processes);
         }));
     }
 
